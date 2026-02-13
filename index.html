@@ -258,6 +258,16 @@
       font-size: 12px;
       color: var(--muted);
     }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
 
     .success {
       display: none;
@@ -452,10 +462,14 @@
     <div class="form-wrapper">
       <span class="form-label">Be the first to know when we launch</span>
 
-      <div class="form" id="emailForm">
-        <input type="email" id="emailInput" placeholder="your@email.com" />
-        <button onclick="handleSubmit()">Notify Me →</button>
-      </div>
+      <form class="form" id="emailForm" name="waitlist" method="POST" data-netlify="true" data-netlify-honeypot="bot-field">
+        <input type="hidden" name="form-name" value="waitlist" />
+        <p class="sr-only">
+          <label>Don't fill this out if you're human: <input name="bot-field" /></label>
+        </p>
+        <input type="email" id="emailInput" name="email" placeholder="your@email.com" required />
+        <button type="submit">Notify Me →</button>
+      </form>
 
       <div class="success" id="successMsg">
         <span class="success-icon">🌟</span>
@@ -463,25 +477,6 @@
       </div>
 
       <p class="form-note">No spam. Just your future.</p>
-    </div>
-
-    <div id="formModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:100; align-items:center; justify-content:center; padding:24px;">
-      <div style="background:#12121a; border:1px solid rgba(201,169,110,0.25); border-radius:16px; width:100%; max-width:520px; overflow:hidden; position:relative;">
-        <div style="display:flex; align-items:center; justify-content:space-between; padding:20px 24px; border-bottom:1px solid rgba(255,255,255,0.06);">
-          <span style="font-family:'Playfair Display',serif; color:#c9a96e; font-size:18px;">Join the Waitlist</span>
-          <button onclick="closeModal()" style="background:none; border:none; color:#8a8580; font-size:22px; cursor:pointer; line-height:1;">×</button>
-        </div>
-        <iframe
-          src="https://docs.google.com/forms/d/e/1FAIpQLSd2RWWgHBsKoekSbvIj-56CAYf4AX-OeSFqznGlOUKntZajFQ/viewform?embedded=true"
-          width="100%"
-          height="420"
-          frameborder="0"
-          marginheight="0"
-          marginwidth="0"
-          style="display:block; background:#12121a;">
-          Loading…
-        </iframe>
-      </div>
     </div>
 
     <div class="counter">
@@ -495,8 +490,13 @@
   </div>
 
   <script>
-    function handleSubmit() {
-      const input = document.getElementById('emailInput');
+    const form = document.getElementById('emailForm');
+    const input = document.getElementById('emailInput');
+    const success = document.getElementById('successMsg');
+    const counter = document.getElementById('signupCount');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
 
       if (!input.value || !input.value.includes('@')) {
         input.style.outline = '2px solid rgba(200,100,100,0.5)';
@@ -504,38 +504,24 @@
         return;
       }
 
-      openModal();
-    }
+      const formData = new FormData(form);
+      fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(formData).toString()
+      })
+        .then(() => {
+          form.style.display = 'none';
+          success.classList.add('show');
 
-    function openModal() {
-      const modal = document.getElementById('formModal');
-      modal.style.display = 'flex';
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeModal() {
-      const modal = document.getElementById('formModal');
-      modal.style.display = 'none';
-      document.body.style.overflow = '';
-
-      const form = document.getElementById('emailForm');
-      const success = document.getElementById('successMsg');
-      const counter = document.getElementById('signupCount');
-
-      form.style.display = 'none';
-      success.classList.add('show');
-
-      let count = parseInt(counter.textContent);
-      count++;
-      counter.textContent = count;
-    }
-
-    document.getElementById('formModal').addEventListener('click', function(e) {
-      if (e.target === this) closeModal();
-    });
-
-    document.getElementById('emailInput').addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') handleSubmit();
+          let count = parseInt(counter.textContent);
+          count++;
+          counter.textContent = count;
+        })
+        .catch(() => {
+          input.style.outline = '2px solid rgba(200,100,100,0.5)';
+          setTimeout(() => input.style.outline = '', 1200);
+        });
     });
   </script>
 </body>
