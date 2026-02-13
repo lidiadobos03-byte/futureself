@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FutureSelf — Who Will You Become?</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --gold: #c9a96e;
+      --gold-light: #e8c98a;
+      --text: #f0ede6;
+      --muted: #8a8580;
+      --accent: #2a1f3d;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 10%, rgba(201,169,110,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 90%, rgba(42,31,61,0.6) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 50% 50%, rgba(18,18,26,0.8) 0%, transparent 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.4;
+    }
+
+    .container {
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 24px;
+      text-align: center;
+    }
+
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+      animation: float 8s ease-in-out infinite;
+    }
+    .orb-1 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(201,169,110,0.12), transparent 70%);
+      top: -100px; left: -100px;
+      animation-delay: 0s;
+    }
+    .orb-2 {
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(120,80,200,0.1), transparent 70%);
+      bottom: -50px; right: -50px;
+      animation-delay: -4s;
+    }
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0); }
+      33% { transform: translate(20px, -30px); }
+      66% { transform: translate(-15px, 20px); }
+    }
+
+    .timeline-line {
+      position: fixed;
+      left: 50%;
+      top: 0;
+      width: 1px;
+      height: 100vh;
+      background: linear-gradient(to bottom, transparent, rgba(201,169,110,0.15) 30%, rgba(201,169,110,0.15) 70%, transparent);
+      transform: translateX(-50%);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(201,169,110,0.08);
+      border: 1px solid rgba(201,169,110,0.2);
+      color: var(--gold);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 8px 18px;
+      border-radius: 100px;
+      margin-bottom: 48px;
+      animation: fadeUp 0.8s ease forwards;
+      opacity: 0;
+    }
+    .badge-dot {
+      width: 6px; height: 6px;
+      background: var(--gold);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+    }
+
+    .headline {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(52px, 9vw, 110px);
+      font-weight: 900;
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+      animation: fadeUp 0.8s ease 0.1s forwards;
+      opacity: 0;
+    }
+    .headline-main {
+      display: block;
+      color: var(--text);
+    }
+    .headline-accent {
+      display: block;
+      color: transparent;
+      -webkit-text-stroke: 1.5px var(--gold);
+      font-style: italic;
+    }
+
+    .year-label {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(18px, 3vw, 28px);
+      color: var(--gold);
+      font-style: italic;
+      margin-bottom: 40px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.2s forwards;
+    }
+
+    .description {
+      max-width: 540px;
+      font-size: clamp(15px, 2vw, 17px);
+      line-height: 1.75;
+      color: var(--muted);
+      font-weight: 300;
+      margin-bottom: 56px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.3s forwards;
+    }
+    .description strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .features {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 64px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.4s forwards;
+    }
+    .feature {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .feature-icon {
+      width: 32px; height: 32px;
+      background: rgba(201,169,110,0.08);
+      border: 1px solid rgba(201,169,110,0.15);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+    }
+
+    .form-wrapper {
+      width: 100%;
+      max-width: 460px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.5s forwards;
+    }
+    .form-label {
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+      display: block;
+    }
+    .form {
+      display: flex;
+      gap: 0;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(201,169,110,0.2);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: border-color 0.3s;
+    }
+    .form:focus-within {
+      border-color: rgba(201,169,110,0.5);
+      box-shadow: 0 0 0 3px rgba(201,169,110,0.06);
+    }
+    .form input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      padding: 16px 20px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+    }
+    .form input::placeholder { color: var(--muted); }
+    .form button {
+      background: var(--gold);
+      border: none;
+      padding: 16px 24px;
+      color: #0a0a0f;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      transition: background 0.2s, transform 0.1s;
+      white-space: nowrap;
+    }
+    .form button:hover { background: var(--gold-light); }
+    .form button:active { transform: scale(0.98); }
+
+    .form-note {
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .success {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      background: rgba(201,169,110,0.08);
+      border: 1px solid rgba(201,169,110,0.25);
+      border-radius: 12px;
+      padding: 16px 24px;
+      color: var(--gold);
+      font-size: 14px;
+    }
+    .success.show { display: flex; }
+    .success-icon { font-size: 20px; }
+
+    .counter {
+      margin-top: 48px;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.6s forwards;
+    }
+    .counter span {
+      color: var(--gold);
+      font-weight: 500;
+    }
+
+    .scroll-hint {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      opacity: 0;
+      animation: fadeUp 1s ease 1s forwards;
+      z-index: 10;
+    }
+    .scroll-arrow {
+      width: 20px; height: 20px;
+      border-right: 1px solid var(--muted);
+      border-bottom: 1px solid var(--muted);
+      transform: rotate(45deg);
+      animation: bounce 2s ease-in-out infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: rotate(45deg) translateY(0); }
+      50% { transform: rotate(45deg) translateY(4px); }
+    }
+
+    .split-preview {
+      display: flex;
+      gap: 3px;
+      margin: 56px 0;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.35s forwards;
+    }
+    .split-card {
+      width: 110px;
+      height: 140px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+    .split-card-now {
+      background: linear-gradient(160deg, #1a1a28, #12121a);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .split-card-future {
+      background: linear-gradient(160deg, #2a1f3d, #1a2a1f);
+      border: 1px solid rgba(201,169,110,0.2);
+      transform: scale(1.05);
+      box-shadow: 0 20px 60px rgba(201,169,110,0.12);
+    }
+    .split-card-dark {
+      background: linear-gradient(160deg, #2a1a1a, #1a1212);
+      border: 1px solid rgba(200,100,100,0.15);
+    }
+    .split-label {
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: center;
+    }
+    .split-card-future .split-label { color: var(--gold); }
+    .split-avatar {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+    .split-card-now .split-avatar { background: rgba(255,255,255,0.05); }
+    .split-card-future .split-avatar {
+      background: rgba(201,169,110,0.15);
+      box-shadow: 0 0 20px rgba(201,169,110,0.2);
+    }
+    .split-card-dark .split-avatar { background: rgba(200,100,100,0.1); }
+    .split-arrow {
+      display: flex;
+      align-items: center;
+      color: var(--muted);
+      font-size: 18px;
+      padding: 0 4px;
+      align-self: center;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 480px) {
+      .features { gap: 16px; }
+      .split-card { width: 88px; height: 118px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="timeline-line"></div>
+
+  <div class="container">
+
+    <div class="badge">
+      <span class="badge-dot"></span>
+      Coming Soon · 2026
+    </div>
+
+    <h1 class="headline">
+      <span class="headline-main">Future</span>
+      <span class="headline-accent">Self</span>
+    </h1>
+
+    <p class="year-label">Who will you be in 5 years?</p>
+
+    <p class="description">
+      Upload your photo today. Choose your path.<br/>
+      <strong>See yourself transformed</strong> — by the decisions you make every single day.
+      Your future is not fixed. It's being written right now.
+    </p>
+
+    <div class="split-preview">
+      <div class="split-card split-card-now">
+        <div class="split-avatar">🧍</div>
+        <span class="split-label">You<br/>Today</span>
+      </div>
+      <div class="split-arrow">→</div>
+      <div class="split-card split-card-future">
+        <div class="split-avatar">✨</div>
+        <span class="split-label">Best<br/>Version</span>
+      </div>
+      <div class="split-arrow">or</div>
+      <div class="split-card split-card-dark">
+        <div class="split-avatar">😔</div>
+        <span class="split-label">Without<br/>Change</span>
+      </div>
+    </div>
+
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">📸</div>
+        AI Photo Transformation
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🔮</div>
+        Future Life Story
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🎯</div>
+        Personal Action Plan
+      </div>
+    </div>
+
+    <div class="form-wrapper">
+      <span class="form-label">Be the first to know when we launch</span>
+
+      <div class="form" id="emailForm">
+        <input type="email" id="emailInput" placeholder="your@email.com" />
+        <button onclick="handleSubmit()">Notify Me →</button>
+      </div>
+
+      <div class="success" id="successMsg">
+        <span class="success-icon">🌟</span>
+        You're on the list! Your future self thanks you.
+      </div>
+
+      <p class="form-note">No spam. Just your future.</p>
+    </div>
+
+    <div id="formModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:100; align-items:center; justify-content:center; padding:24px;">
+      <div style="background:#12121a; border:1px solid rgba(201,169,110,0.25); border-radius:16px; width:100%; max-width:520px; overflow:hidden; position:relative;">
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:20px 24px; border-bottom:1px solid rgba(255,255,255,0.06);">
+          <span style="font-family:'Playfair Display',serif; color:#c9a96e; font-size:18px;">Join the Waitlist</span>
+          <button onclick="closeModal()" style="background:none; border:none; color:#8a8580; font-size:22px; cursor:pointer; line-height:1;">×</button>
+        </div>
+        <iframe
+          src="https://docs.google.com/forms/d/e/1FAIpQLSd2RWWgHBsKoekSbvIj-56CAYf4AX-OeSFqznGlOUKntZajFQ/viewform?embedded=true"
+          width="100%"
+          height="420"
+          frameborder="0"
+          marginheight="0"
+          marginwidth="0"
+          style="display:block; background:#12121a;">
+          Loading…
+        </iframe>
+      </div>
+    </div>
+
+    <div class="counter">
+      <span id="signupCount">247</span> people already waiting for their future
+    </div>
+
+  </div>
+
+  <div class="scroll-hint">
+    <div class="scroll-arrow"></div>
+  </div>
+
+  <script>
+    function handleSubmit() {
+      const input = document.getElementById('emailInput');
+
+      if (!input.value || !input.value.includes('@')) {
+        input.style.outline = '2px solid rgba(200,100,100,0.5)';
+        setTimeout(() => input.style.outline = '', 1000);
+        return;
+      }
+
+      openModal();
+    }
+
+    function openModal() {
+      const modal = document.getElementById('formModal');
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('formModal');
+      modal.style.display = 'none';
+      document.body.style.overflow = '';
+
+      const form = document.getElementById('emailForm');
+      const success = document.getElementById('successMsg');
+      const counter = document.getElementById('signupCount');
+
+      form.style.display = 'none';
+      success.classList.add('show');
+
+      let count = parseInt(counter.textContent);
+      count++;
+      counter.textContent = count;
+    }
+
+    document.getElementById('formModal').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+
+    document.getElementById('emailInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') handleSubmit();
+    });
+  </script>
+</body>
+</html>
