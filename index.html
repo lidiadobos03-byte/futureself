@@ -492,14 +492,8 @@
     <div class="form-wrapper">
       <span class="form-label">Be the first to know when we launch</span>
 
-      <form class="form" id="emailForm" name="waitlist" method="POST" data-netlify="true" data-netlify-honeypot="bot-field">
-        <input type="hidden" name="form-name" value="waitlist" />
-        <input type="hidden" name="subject" value="New waitlist signup from %{formName}" />
-        <input type="hidden" name="replyto" value="%{submission.email}" />
-        <p class="sr-only">
-          <label>Don't fill this out if you're human: <input name="bot-field" /></label>
-        </p>
-        <input type="email" id="emailInput" name="email" placeholder="your@email.com" required />
+      <form class="form" id="emailForm" method="POST" action="https://docs.google.com/forms/d/e/1FAIpQLSd2RWWgHBsKoekSbvIj-56CAYf4AX-OeSFqznGlOUKntZajFQ/formResponse" target="hidden_iframe">
+        <input type="email" id="emailInput" name="entry.427106571" placeholder="your@email.com" required />
         <button type="submit">Notify Me →</button>
       </form>
 
@@ -518,6 +512,8 @@
     </div>
 
   </div>
+
+  <iframe name="hidden_iframe" style="display:none;"></iframe>
 
   <div class="scroll-hint">
     <div class="scroll-arrow"></div>
@@ -538,24 +534,13 @@
         return;
       }
 
-      const formData = new FormData(form);
-      fetch('/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams(formData).toString()
-      })
-        .then(() => {
-          form.style.display = 'none';
-          success.classList.add('show');
+      form.submit();
+      form.style.display = 'none';
+      success.classList.add('show');
 
-          let count = parseInt(counter.textContent);
-          count++;
-          counter.textContent = count;
-        })
-        .catch(() => {
-          input.style.outline = '2px solid rgba(200,100,100,0.5)';
-          setTimeout(() => input.style.outline = '', 1200);
-        });
+      let count = parseInt(counter.textContent);
+      count++;
+      counter.textContent = count;
     });
 
     const copyBtn = document.getElementById('copyLinkBtn');
